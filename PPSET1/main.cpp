@@ -11,13 +11,25 @@ int main(int argc, char** argv) {
     int numtrials = atoi(argv[3]);
     int dimension = atoi(argv[4]);
 
+    if (dimension > 4 || dimension < 0) {
+        throw std::invalid_argument("dimension must be between 0 and 4, inclusive.");
+    }
+
     debug_printf("%i total trials.\n", numtrials);
 
+    std::vector<double> msts;
     for (int t = 0; t < numtrials; t++) {
-        printf("Trial %i\n",t);
+        debug_printf("Trial %i\n",t);
         RandomGraph trial_graph(numpoints, dimension);
         for ( int i = 0; i < 5; i++) {
-            trial_graph.prim();
+            msts.push_back(trial_graph.prim());
         }
     }
+
+    double avg = 0.0;
+    for (int i = 0; i < msts.size(); i++) {
+        avg += msts[i];
+    }
+    avg /= msts.size();
+    printf("%f\n",avg);
 }

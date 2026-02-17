@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <cstdlib>
 #include <stdarg.h>
+#include <vector>
 #include <cmath>
 #include <bits/stdc++.h>
 #include "graph.h"

@@ -1,6 +1,5 @@
 #include "libs.h"
 
-
 bool ispower2(int d) {
     return d > 0 && (d & (d - 1)) == 0;
 }
@@ -17,10 +16,8 @@ double dist(int n, double* coord1, double* coord2) {
 RandomGraph::RandomGraph(int n, int type) {
     this->n = n;
     this->type = type;
-    
-    printf("Reseed start\n");
+
     reseed();
-    printf("Reseed end\n");
 
     if (type == 2 || type == 3 || type == 4) {
         //generate coordinates if needed
@@ -70,9 +67,42 @@ double RandomGraph::prim() {
         }
     }
 
+    std::vector<bool> inMST(n, false);
+    std::vector<int> vertices(n);
+    std::vector<double> priorities(n);
 
+    const double INF = std::numeric_limits<double>::max();
 
-    return 0.0;
+    for (int i = 0; i < n; i++) {
+        vertices[i] = i;
+        priorities[i] = INF;
+    }
+    priorities[0] = 0;
+    PriorityQueue pq(n, vertices.data(), priorities.data());
+    double total = 0.0;
+
+    while (pq.getSize() > 0) {
+        int u = pq.extractMin();
+
+        inMST[u] = true;
+        total += priorities[u];
+        
+        for (int v = 0; v < n; v++) {
+            //only non-complete graph type
+            if (type == 1 && !ispower2(std::abs(v-u))) continue;
+
+            if (!inMST[v]) {
+                double w = weight(u,v);
+                if (priorities[v] > w) {
+                    priorities[v] = w;
+                    pq.decreasePriority(v,w);
+
+                }
+            }
+        }
+    }
+
+    return total;
 }
 
 RandomGraph::~RandomGraph() {
@@ -83,26 +113,107 @@ RandomGraph::~RandomGraph() {
 
 
 //build queue
-MinHeap::MinHeap(int n, int* arr) {
-    int* heap = new int[n];
+PriorityQueue::PriorityQueue(int n, int* arr, double* priorities) {
+    size = n;
+    heap.assign(priorities,priorities + n);
+    queue.assign(arr,arr + n);
+    pos.resize(n);
+
+    for (int i = 0; i < n; i++) {
+        pos[queue[i]] = i;
+    }
+
+    for (int i = (n / 2) - 1; i >= 0; i--) {
+        heapify(i);
+    }
 }
 
-MinHeap::~MinHeap() {
-    delete[] heap;
+PriorityQueue::~PriorityQueue() {
 }
 
-void MinHeap::minHeapify(int* heap, int node) {
+void PriorityQueue::heapify(int node) {
+    int l = left(node);
+    int r = right(node);
+
+    int smallest;
+    if (l < size && heap[l] < heap[node]) {
+        smallest = l;
+    } else {
+        smallest = node;
+    }
+    if (r < size && heap[r] < heap[smallest]) {
+        smallest = r;
+    }
+    if (smallest != node) {
+        std::swap(heap[node],heap[smallest]);
+        std::swap(queue[node],queue[smallest]);
+
+        //update positions
+        pos[queue[node]] = node;
+        pos[queue[smallest]] = smallest;
+
+        heapify(smallest);
+    }
+    return;
 
 }
 
-int MinHeap::left(int node) {
+int PriorityQueue::left(int node) {
     return node * 2 + 1;
 }
 
-int MinHeap::right(int node) {
+int PriorityQueue::right(int node) {
     return node * 2 + 2;
 }
 
-void insert(int n) {
+int PriorityQueue::parent(int node) {
+    return (node - 1) / 2;
+}
 
+int PriorityQueue::extractMin() {
+    int min = queue[0];
+    heap[0] = heap[size - 1];
+    queue[0] = queue[size - 1];
+    pos[queue[0]] = 0;
+    size--;
+    heapify(0);
+    pos[min] = -1;
+    return min;
+}
+
+void PriorityQueue::insert(double v) {
+    heap[size] = v;
+    int n = size;
+    size++;
+    while (n != 0 && heap[parent(n)] > heap[n]) {
+        //update heap
+        int p = parent(n);
+        int tmp = heap[p];
+        heap[p] = heap[n];
+        heap[n] = tmp;
+
+        //update queue
+        tmp = queue[p];
+        queue[p] = queue[n];
+        queue[n] = tmp;
+
+        n = p;
+    }
+}
+
+void PriorityQueue::decreasePriority(int v, double new_priority) {
+    int node = pos[v];
+    heap[node] = new_priority;
+    
+    while (node != 0 && heap[parent(node)] > heap[node]) {
+        int p = parent(node);
+        
+        std::swap(heap[node],heap[p]);
+        std::swap(queue[node],queue[p]);
+
+        pos[queue[node]] = node;
+        pos[queue[p]] = p;
+
+        node = p;
+    }
 }

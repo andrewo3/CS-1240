@@ -25,18 +25,30 @@ class RandomGraph {
 
 
 //min heap with relevant minimum extracting algorithm
-class MinHeap {
+class PriorityQueue {
     public:
-        MinHeap(int n, int* arr);
-        ~MinHeap();
-        void minHeapify(int* heap, int node);
+        PriorityQueue(int n, int* arr, double* priorities);
+        ~PriorityQueue();
+        void heapify(int node);
         int extractMin();
+        void insert(double v);
+        int getSize() {
+            return size;
+        }
+        void decreasePriority(int node, double new_priority);
 
     private:
-        int* heap;
+        int size;
+        std::vector<double> heap;
+        std::vector<int> queue;
+        std::vector<int> pos;
         int left(int node);
         int right(int node);
+        int parent(int node);
+        
 
-}
+};
+
+
 
 #endif

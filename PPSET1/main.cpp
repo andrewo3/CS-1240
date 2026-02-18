@@ -17,19 +17,13 @@ int main(int argc, char** argv) {
 
     debug_printf("%i total trials.\n", numtrials);
 
-    std::vector<double> msts;
+    double avg = 0.0;
+    RandomGraph trial_graph(numpoints, dimension);
     for (int t = 0; t < numtrials; t++) {
         debug_printf("Trial %i\n",t);
-        RandomGraph trial_graph(numpoints, dimension);
-        for ( int i = 0; i < 5; i++) {
-            msts.push_back(trial_graph.prim());
-        }
+        avg += trial_graph.prim();
+        trial_graph.reseed();
     }
-
-    double avg = 0.0;
-    for (int i = 0; i < msts.size(); i++) {
-        avg += msts[i];
-    }
-    avg /= msts.size();
+    avg /= numtrials;
     printf("%f\n",avg);
 }

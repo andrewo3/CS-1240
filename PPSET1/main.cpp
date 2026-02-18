@@ -25,5 +25,5 @@ int main(int argc, char** argv) {
         trial_graph.reseed();
     }
     avg /= numtrials;
-    printf("%f\n",avg);
+    printf("%f %i %i %i\n",avg,numpoints,numtrials,dimension);
 }

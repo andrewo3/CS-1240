@@ -8,7 +8,7 @@ df = pd.read_csv("output.csv")
 # Only dimension 1–4
 df = df[df["dimension"].between(1, 4)]
 
-fig, axes = plt.subplots(4, 1, figsize=(8, 20))
+fig, axes = plt.subplots(2, 2, figsize=(8, 8))
 
 for idx, dimension in enumerate(range(1, 5)):
     sub = df[df["dimension"] == dimension]
@@ -31,13 +31,13 @@ for idx, dimension in enumerate(range(1, 5)):
     print(f"  Fit: y = {a:.6f} * n^{b:.6f}\n")
 
     # Plot
-    axes[idx].scatter(n, y)
-    axes[idx].plot(n, a * n**b)
-    axes[idx].set_xscale("log")
-    axes[idx].set_yscale("log")
-    axes[idx].set_title(f"Log-Log Fit (dimension = {dimension})")
-    axes[idx].set_xlabel("n")
-    axes[idx].set_ylabel("output")
+    axes[idx%2,idx//2].scatter(n, y)
+    axes[idx%2,idx//2].plot(n, a * n**b)
+    axes[idx%2,idx//2].set_xscale("log")
+    axes[idx%2,idx//2].set_yscale("log")
+    axes[idx%2,idx//2].set_title(f"Log-Log Fit (dimension = {dimension})")
+    axes[idx%2,idx//2].set_xlabel("n")
+    axes[idx%2,idx//2].set_ylabel("output")
 
 plt.tight_layout()
 plt.savefig("loglog_fit.png")

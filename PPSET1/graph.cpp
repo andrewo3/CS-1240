@@ -79,6 +79,7 @@ double RandomGraph::prim() {
     PriorityQueue pq(n, vertices.data(), priorities.data());
     double total = 0.0;
 
+    //precompute log of n
     int ln = log2l(n);
 
     int C = 1;
